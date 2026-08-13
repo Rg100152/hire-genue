@@ -1,6 +1,4 @@
-Here's a comprehensive README.md for your HireGenius AI Recruiting Platform with 10 stock images:
 
-```markdown
 # 🧠 HireGenius - AI Recruiting Platform
 
 ![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)
