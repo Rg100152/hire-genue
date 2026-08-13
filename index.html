@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HireGenius - AI Recruiting Platform</title>
+    <!-- Google Fonts: Outfit for a modern tech vibe -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* =========================================
+           CSS VARIABLES & GLOBAL STYLES
+        ========================================= */
+        :root {
+            --bg-dark: #0a0a12;
+            --glass-bg: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --accent-primary: #6366f1; /* Neon Indigo */
+            --accent-glow: rgba(99, 102, 241, 0.5);
+            --accent-secondary: #a855f7; /* Purple */
+            --success: #10b981; /* Emerald Green */
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            min-height: 100vh;
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(circle at 15% 50%, rgba(99, 102, 241, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 85% 30%, rgba(168, 85, 247, 0.08) 0%, transparent 50%);
+        }
+
+        /* =========================================
+           NAVIGATION BAR
+        ========================================= */
+        nav {
+            padding: 20px 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--glass-border);
+            background: rgba(10, 10, 18, 0.8);
+            backdrop-filter: blur(12px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-size: 1.6rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            letter-spacing: 1px;
+            background: linear-gradient(to right, var(--accent-primary), var(--accent-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 30px;
+        }
+
+        .nav-link {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            color: var(--text-main);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            color: white;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: 0 4px 15px var(--accent-glow);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px var(--accent-glow);
+        }
+
+        /* =========================================
+           HERO & UPLOAD SECTION
+        ========================================= */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 5%;
+        }
+
+        .hero {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            line-height: 1.2;
+        }
+
+        .hero p {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Glassmorphism Upload Box */
+        .ai-scanner-box {
+            background: var(--glass-bg);
+            border: 1px dashed var(--accent-primary);
+            border-radius: 20px;
+            padding: 50px 30px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+            transition: var(--transition);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .ai-scanner-box:hover {
+            border-color: var(--accent-secondary);
+            background: rgba(255,255,255,0.05);
+        }
+
+        .upload-icon {
+            font-size: 3rem;
+            color: var(--accent-primary);
+            margin-bottom: 20px;
+        }
+
+        /* Scanning Animation */
+        .scan-line {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: var(--accent-primary);
+            box-shadow: 0 0 20px 5px var(--accent-primary);
+            animation: scan 2s infinite ease-in-out;
+            display: none; /* Hidden by default */
+        }
+
+        @keyframes scan {
+            0% { top: 0; opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { top: 100%; opacity: 0; }
+        }
+
+        /* =========================================
+           DASHBOARD / JOB MATCHES
+        ========================================= */
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 50px 0 20px;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .jobs-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 25px;
+        }
+
+        .job-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 25px;
+            backdrop-filter: blur(10px);
+            transition: var(--transition);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .job-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(99, 102, 241, 0.4);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .match-badge {
+            align-self: flex-start;
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--success);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .job-title {
+            font-size: 1.3rem;
+            margin-bottom: 5px;
+        }
+
+        .company {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .req-skills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 25px;
+        }
+
+        .skill-tag {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .btn-outline {
+            margin-top: auto;
+            width: 100%;
+            padding: 10px;
+            background: transparent;
+            border: 1px solid var(--glass-border);
+            color: var(--text-main);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: var(--transition);
+            font-weight: 500;
+        }
+
+        .btn-outline:hover {
+            background: var(--glass-bg);
+            border-color: var(--accent-primary);
+            color: var(--accent-primary);
+        }
+
+        /* =========================================
+           AI ANALYSIS MODAL
+        ========================================= */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(5px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        .modal-content {
+            background: #13131f;
+            border: 1px solid var(--glass-border);
+            width: 90%;
+            max-width: 500px;
+            border-radius: 20px;
+            padding: 30px;
+            position: relative;
+            transform: translateY(20px);
+            transition: transform 0.3s;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        }
+
+        .modal-overlay.active .modal-content {
+            transform: translateY(0);
+        }
+
+        .ai-score-circle {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            border: 4px solid var(--success);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--success);
+            margin: 0 auto 20px;
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.2);
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 15px; right: 20px;
+            font-size: 1.5rem;
+            color: var(--text-muted);
+            cursor: pointer;
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- Navigation -->
+    <nav>
+        <div class="logo">
+            <i class="fa-solid fa-brain"></i> HireGenius
+        </div>
+        <div class="nav-links">
+            <a class="nav-link active">Dashboard</a>
+            <a class="nav-link">Jobs</a>
+            <a class="nav-link">Candidates</a>
+        </div>
+        <button class="btn-primary">Post a Job</button>
+    </nav>
+
+    <div class="container">
+        
+        <!-- Hero Section -->
+        <div class="hero">
+            <h1>Hire Smarter with <span style="background: linear-gradient(to right, var(--accent-primary), var(--accent-secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">AI Engine</span></h1>
+            <p>Upload a candidate's CV and let our advanced AI instantly analyze skills, experience, and match them with the perfect open roles in milliseconds.</p>
+        </div>
+
+        <!-- AI Drag & Drop CV Scanner -->
+        <div class="ai-scanner-box" id="drop-zone" onclick="simulateUpload()">
+            <div class="scan-line" id="scan-line"></div>
+            <i class="fa-solid fa-cloud-arrow-up upload-icon" id="upload-icon"></i>
+            <h3 style="margin-bottom: 10px; font-size: 1.4rem;" id="upload-title">Drop CV/Resume here</h3>
+            <p style="color: var(--text-muted);" id="upload-desc">Supports PDF, DOCX (Max 5MB)</p>
+        </div>
+
+        <!-- Dynamic Matches Section -->
+        <div class="section-header">
+            <div class="section-title">Top AI Recommendations</div>
+            <div style="color: var(--text-muted); font-size: 0.9rem;"><i class="fa-solid fa-bolt"></i> Real-time matching</div>
+        </div>
+
+        <div class="jobs-grid" id="jobs-container">
+            <!-- JS will inject Job Cards here -->
+        </div>
+
+        <footer style="margin-top: 60px; text-align: center; color: var(--text-muted); font-size: 0.9rem; padding: 20px 0; border-top: 1px solid var(--glass-border);">
+            <p>&copy; 2026 HireGenius AI. Designed & Developed by Raj Gautam.</p>
+        </footer>
+    </div>
+
+    <!-- AI Analysis Modal -->
+    <div class="modal-overlay" id="ai-modal">
+        <div class="modal-content">
+            <i class="fa-solid fa-xmark modal-close" onclick="closeModal()"></i>
+            <h2 style="text-align: center; margin-bottom: 5px;">AI Resume Analysis</h2>
+            <p style="text-align: center; color: var(--text-muted); margin-bottom: 30px;">Raj_Gautam_Resume.pdf</p>
+            
+            <div class="ai-score-circle">
+                94%
+            </div>
+            
+            <h3 style="margin-bottom: 15px; font-size: 1.1rem;">Extracted Skills:</h3>
+            <div class="req-skills" style="margin-bottom: 25px;">
+                <span class="skill-tag" style="background: rgba(99, 102, 241, 0.2); border-color: var(--accent-primary); color: white;">JavaScript</span>
+                <span class="skill-tag" style="background: rgba(99, 102, 241, 0.2); border-color: var(--accent-primary); color: white;">Linux / Pop!_OS</span>
+                <span class="skill-tag" style="background: rgba(99, 102, 241, 0.2); border-color: var(--accent-primary); color: white;">Database Mgmt</span>
+                <span class="skill-tag" style="background: rgba(99, 102, 241, 0.2); border-color: var(--accent-primary); color: white;">AI Integration</span>
+                <span class="skill-tag">Cybersecurity basics</span>
+            </div>
+
+            <button class="btn-primary" style="width: 100%;" onclick="closeModal()">View Perfect Matches Below</button>
+        </div>
+    </div>
+
+    <!-- JavaScript for Logic -->
+    <script>
+        // Mock DB: Jobs Data
+        const jobsData = [
+            {
+                id: 1,
+                title: "Frontend React Developer",
+                company: "TechNova Solutions",
+                match: 94,
+                skills: ["React", "JavaScript", "Tailwind CSS"],
+                icon: "fa-laptop-code"
+            },
+            {
+                id: 2,
+                title: "Database Administrator",
+                company: "DataCore Enterprise",
+                match: 88,
+                skills: ["SQL", "DBMS", "Optimization"],
+                icon: "fa-database"
+            },
+            {
+                id: 3,
+                title: "Cybersecurity Analyst",
+                company: "ShieldX Security",
+                match: 82,
+                skills: ["Malware Analysis", "Linux", "Network Sec"],
+                icon: "fa-shield-halved"
+            }
+        ];
+
+        // Render Jobs
+        function renderJobs() {
+            const container = document.getElementById('jobs-container');
+            container.innerHTML = '';
+
+            jobsData.forEach(job => {
+                const cardHTML = `
+                    <div class="job-card">
+                        <div class="match-badge">
+                            <i class="fa-solid fa-sparkles"></i> ${job.match}% Match
+                        </div>
+                        <h3 class="job-title">${job.title}</h3>
+                        <div class="company"><i class="fa-solid ${job.icon}"></i> ${job.company}</div>
+                        
+                        <div class="req-skills">
+                            ${job.skills.map(skill => `<span class="skill-tag">${skill}</span>`).join('')}
+                        </div>
+                        
+                        <button class="btn-outline">Review Candidate</button>
+                    </div>
+                `;
+                container.innerHTML += cardHTML;
+            });
+        }
+
+        // Simulate AI CV Scanning
+        function simulateUpload() {
+            const scanLine = document.getElementById('scan-line');
+            const icon = document.getElementById('upload-icon');
+            const title = document.getElementById('upload-title');
+            const desc = document.getElementById('upload-desc');
+
+            // UI Changes during scanning
+            scanLine.style.display = 'block';
+            icon.className = 'fa-solid fa-microchip upload-icon';
+            icon.style.animation = 'pulse 1s infinite';
+            title.innerText = 'AI Engine Analyzing...';
+            title.style.color = 'var(--accent-primary)';
+            desc.innerText = 'Extracting skills and experience points';
+
+            // Simulate Network/Processing Delay
+            setTimeout(() => {
+                // Reset UI
+                scanLine.style.display = 'none';
+                icon.className = 'fa-solid fa-cloud-arrow-up upload-icon';
+                icon.style.animation = 'none';
+                title.innerText = 'Drop CV/Resume here';
+                title.style.color = 'var(--text-main)';
+                desc.innerText = 'Supports PDF, DOCX (Max 5MB)';
+                
+                // Show Result Modal
+                document.getElementById('ai-modal').classList.add('active');
+            }, 2500); // 2.5 seconds scanning time
+        }
+
+        // Close Modal
+        function closeModal() {
+            document.getElementById('ai-modal').classList.remove('active');
+        }
+
+        // Initialize App
+        window.onload = () => {
+            renderJobs();
+        };
+    </script>
+</body>
+</html>
